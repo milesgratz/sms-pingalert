@@ -1,10 +1,10 @@
 #!/bin/bash
-# for email alert
-EMAIL=milesgratz@gmail.com
-# for SMS alert
-SMSEMAIL=7084464185@txt.att.net 
 # sender email (requires mailutils configuration)
-SENDEREMAIL=milesgratz@gmail.com  
+SENDEREMAIL=milesgratz@gmail.com
+# recipient for email alert
+EMAIL=milesgratz@gmail.com
+# recipient for SMS alert
+SMSEMAIL=7084464185@txt.att.net
 # server you expect to respond (eliminate false positives)
 CONTROL=http://google.com
 # server you are monitoring
