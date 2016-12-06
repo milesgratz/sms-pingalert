@@ -1,12 +1,18 @@
 #!/bin/bash
-EMAIL=milesgratz@gmail.com			# for email alert 
-SMSEMAIL=7084464185@txt.att.net		# for SMS alert
-SENDEREMAIL=milesgratz@gmail.com	# sender email (requires mailutils configuration) 
-CONTROL=http://google.com			# server you expect to respond (eliminate false positives)
-SERVER=http://example.org			# server you are monitoring 
-TIMEZONE=US/Central					# manually define time zone for recipient
-NOTIFYIF=5							# number of minutes before notifying via SMS 
-
+# for email alert
+EMAIL=milesgratz@gmail.com
+# for SMS alert
+SMSEMAIL=7084464185@txt.att.net 
+# sender email (requires mailutils configuration)
+SENDEREMAIL=milesgratz@gmail.com  
+# server you expect to respond (eliminate false positives)
+CONTROL=http://google.com
+# server you are monitoring
+SERVER=http://example.org
+# manually define time zone for recipient
+TIMEZONE=US/Central
+# number of minutes before notifying via SMS
+NOTIFYIF=5
 
 while true
 do
