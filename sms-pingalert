@@ -1,0 +1,60 @@
+#!/bin/bash
+EMAIL=milesgratz@gmail.com			# for email alert 
+SMSEMAIL=7084464185@txt.att.net		# for SMS alert
+SENDEREMAIL=milesgratz@gmail.com	# sender email (requires mailutils configuration) 
+CONTROL=http://google.com			# server you expect to respond (eliminate false positives)
+SERVER=http://example.org			# server you are monitoring 
+TIMEZONE=US/Central					# manually define time zone for recipient
+NOTIFYIF=5							# number of minutes before notifying via SMS 
+
+
+while true
+do
+    /usr/bin/curl -sSf $CONTROL > /dev/null 2>&1
+    CONTROL_STATE=$?
+    /usr/bin/curl -sSf $SERVER > /dev/null 2>&1
+    SERVER1_STATE=$?
+
+    if [ $CONTROL -eq 0 ] && [ $SERVER_STATE -eq 0 ]
+    then
+        DATE=`TZ=":$TIMEZONE" date +%m/%d/%Y`
+        TIME=`TZ=":$TIMEZONE" date +"%r"`
+        echo "$SERVER online ($TIME $DATE)"
+        sleep 5
+    fi
+
+    if [ $CONTROL -eq 0 ] && [ $SERVER_STATE -ne 0 ]
+    then
+        DATE=`TZ=":$TIMEZONE" date +%m/%d/%Y`
+        TIME=`TZ=":$TIMEZONE" date +"%r"`
+        SECONDS=0
+
+        echo "$SERVER went Offline ($TIME $DATE)"
+
+        until [ $SERVER_STATE -eq 0 ]
+        do
+                /usr/bin/curl -sSf $SERVER > /dev/null 2>&1
+                SERVER_STATE=$?
+
+                MIN_DOWNTIME=$((SECONDS/60))
+                if [ $(($MIN_DOWNTIME % $NOTIFYIF)) -eq 0 ] && [ $MIN_DOWNTIME -ne 0 ]
+                then
+                        echo "$SERVER Offline (~ $MIN_DOWNTIME mins)"
+                        echo "$SERVER Offline (~ $MIN_DOWNTIME mins) since $TIME $DATE" | mail -s "$SERVER Offline (~ $MIN_DOWNTIME mins)" -a "From: Network Alert <$SENDEREMAIL>" -t $EMAIL,$SMSEMAIL
+                        sleep 55
+                fi
+                sleep 5
+        done
+
+        if [ $SERVER_STATE -eq 0 ]
+        then
+            ONLINE_DATE=`TZ=":$TIMEZONE" date +%m/%d/%Y`
+            ONLINE_TIME=`TZ=":$TIMEZONE" date +"%r"`
+            echo "$SERVER now Online. Outage lasted from $TIME to $ONLINE_TIME."
+            if [ $MIN_DOWNTIME -gt $NOTIFYIF ]
+            then
+                echo "$SERVER now Online. Outage lasted from $TIME to $ONLINE_TIME." | mail -s "$SERVER now Online" -a "From: Network Alert <$SENDEREMAIL>" -t $EMAIL,$SMSEMAIL
+            fi
+        fi
+    fi
+done
